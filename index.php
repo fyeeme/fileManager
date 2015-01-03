@@ -8,8 +8,8 @@
 require_once 'dir.func.php';
 require_once 'file.func.php';
 require_once 'comm.func.php';
-$path = "file"; //从哪个目录读取文件
-$path = $_REQUEST['path']?$_REQUEST['path']:$path;
+$path = "file";
+$path = $_REQUEST['path']?$_REQUEST['path']:$path;  //从哪个目录读取文件
 $mode = $_REQUEST['mode'];
 $filename = $_REQUEST['filename'];
 $dirname = $_REQUEST['dirname'];
@@ -198,7 +198,9 @@ elseif($mode =='downFile'){
                         if(in_array($ext, $imageExt)){
                             ?>
                             <a href="#" onclick="viewImage(<?php echo "'".$p."'"; ?>)"><img class="small" src="images/show.png"  alt="" title="查看"/></a>
-                        <?php }else{  ?>
+                        <?php
+                            }else{
+                        ?>
                             <a href="index.php?mode=showContent&path=<?php echo $path;?>&filename=<?php echo $p;?>" ><img class="small" src="images/show.png"  alt="" title="查看"/></a>|
                         <?php } ?>
                         <a href="index.php?mode=editContent&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/edit.png"  alt="" title="修改"/></a>|
@@ -228,7 +230,7 @@ elseif($mode =='downFile'){
                     <td><?php echo $i; ?></td>
                     <td><?php echo $file; ?></td>
                     <td><?php $src = filetype($p)=="file"?"file_ico.png": "folder_ico.png"; ?> <img src="images/<?php echo $src; ?> " title="<?php $src =filetype($p)=="file"?"文件":"文件夹"; echo $src; ?>" </img></td>
-                    <td><?php $size =filesize($p); echo transByte($size) ; ?></td>
+                    <td><?php $sum =0;$size =dirsize($p); echo transByte($size) ; ?></td>
                     <td><?php $r =is_readable($p)?"correct.png":"error.png"; ?> <img src="images/<?php echo $r?>"  class="small" /></td>
                     <td><?php $w =is_writable($p)?"correct.png":"error.png"; ?> <img src="images/<?php echo $w?>"  class="small"/></td>
                     <td><?php $e =is_executable($p)?"correct.png":"error.png"; ?><img src="images/<?php echo $e?>" class="small"/> </td>
@@ -236,8 +238,7 @@ elseif($mode =='downFile'){
                     <td><?php echo date("Y-m-d H:i:m",filemtime($p)); ?></td>
                     <td><?php echo date("Y-m-d H:i:m",fileatime($p)); ?></td>
                     <td>
-                        <a href="index.php?mode=showContent$paht=<?php echo $path;?>&filename=<?php echo $p ?>"></a>
-                        <a href="index.php?mode=showContent&path=<?php echo $path;?>&filename=<?php echo $p;?>" ><img class="small" src="images/show.png"  alt="" title="查看"/></a>|
+                        <a href="index.php?path=<?php echo $p;?>"><img class="small" src="images/show.png"  alt="" title="查看"/></a>
                         <a href="index.php?mode=editContent&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/edit.png"  alt="" title="修改"/></a>|
                         <a href="index.php?mode=renameFile&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/rename.png"  alt="" title="重命名"/></a>|
                         <a href="index.php?mode=copyFile&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/copy.png"  alt="" title="复制"/></a>|

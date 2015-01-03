@@ -23,6 +23,30 @@ function readDirectory($path){
     return $arr;
 }
 
+function dirsize($path){
+    $handler = opendir($path);
+    $sum =0;
+    global $sum;
+    while(($item = readdir($handler)) !== false){
+        $fp = $path."/".$item;
+        if($item !="." && $item !=".."){
+            if(is_file($fp)){
+                $sum += filesize($fp);
+            }
+            if(is_dir($fp)){
+                $func = __FUNCTION__;
+                $func($fp);
+            }
+        }
+    }
+    closedir($path);
+    return $sum;
+    // return transByte($sum);
+}
+//$path ='file';
+//print_r(readDirectory($path));
+//echo dirsize($path);
+
 
 /**
  * @param $dirname 文件夹全路径
@@ -43,7 +67,5 @@ function createFolder($dirname){
     }
     return $msg;
 }
-//$//path ='file';
-//print_r(readDirectory($path));
 
 
