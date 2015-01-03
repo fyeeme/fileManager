@@ -123,7 +123,8 @@ elseif($mode =='downFile'){
         <li><a href="#" onclick="show('createFile');" title="新建文件"><span class="icon icon-small icon-square"><span class="icon-file"></span></span></a> </li>
         <li><a href="#" onclick="show('createFloder');" title="新建文件夹" title="创建文件夹"><span class="icon icon-small icon-square"><span class="icon-folder"></span></span></a> </li>
         <li><a href="#" onclick="show('uploadFile');" title="上传文件"><span class="icon icon-small icon-square"><span class="icon-upload"></span></span></a> </li>
-        <li><a href="返回上级目录" title="返回上级目录"><span class="icon icon-small icon-square"><span class="icon-arrowLeft"></span></span></a></li>
+        <?php $back = $path=="file" ? "file": dirname($path);?>
+        <li><a href="#" onclick="getBack(<?php echo "'".$back."'";?>);" title="返回上级目录"><span class="icon icon-small icon-square"><span class="icon-arrowLeft"></span></span></a></li>
     </ul>
 </div>
 <form modeion="index.php" method="post" enctype="multipart/form-data" >
@@ -239,7 +240,6 @@ elseif($mode =='downFile'){
                     <td><?php echo date("Y-m-d H:i:m",fileatime($p)); ?></td>
                     <td>
                         <a href="index.php?path=<?php echo $p;?>"><img class="small" src="images/show.png"  alt="" title="查看"/></a>
-                        <a href="index.php?mode=editContent&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/edit.png"  alt="" title="修改"/></a>|
                         <a href="index.php?mode=renameFile&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/rename.png"  alt="" title="重命名"/></a>|
                         <a href="index.php?mode=copyFile&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/copy.png"  alt="" title="复制"/></a>|
                         <a href="index.php?mode=cutFile&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/cut.png"  alt="" title="剪切"/></a>|
@@ -281,7 +281,9 @@ elseif($mode =='downFile'){
             window.location.href='index.php?mode=deleteFile&filename='+file+'&path='+path;
         }
     }
-
+    function getBack(backUrl){
+        window.location.href='index.php?path='+backUrl;
+    }
 
 </script>
 </body>
