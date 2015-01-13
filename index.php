@@ -19,6 +19,8 @@ if(!$arr){
     echo "<script>alert('没有文件或者目录!!!')</script>";
 }
 $url = "index.php?path={$path}";
+
+#主目录操作
 if($mode == "创建文件"){
     $msg =createFile($path."/".$filename);
    alertMsg($msg, $url);
@@ -32,7 +34,28 @@ else if($mode =='上传文件'){
     $msg = uploadFile($file, $path);
     alertMsg($msg, $url);
 }
-else if($mode == 'showContent'){
+#主目录操作结束
+if($mode=='cutFile'){
+    $str ="
+        <form action='index.php?mode=doCutFile' method='post'>
+            <input type='hidden' name='filename' value='{$filename}' />
+            <input type='hidden' name='path' value='{$path}' />
+            <label>前切：</label>
+            <input type='text' name='disFile' placeholder='前切到'>
+            <input type='submit' value='确定'/>
+        </form>";
+    echo $str;
+}else if($mode =='doCutFile'){
+    $src = $filename;
+    $dist = $_REQUEST['disFile'];
+
+    $msg =cuteFile($src, $path."/".$dist);
+    alertMsg($msg, $url);
+}
+
+
+#查看文件
+else if($mode == 'viewFile'){
     $content = file_get_contents($filename);
     if(strlen($content)){
         $content=  highlight_string($content, true);
@@ -43,10 +66,11 @@ else if($mode == 'showContent'){
         //echo "<script>alert('没有文件或者目录!!!')</script>";
     }
 }
-else if($mode =='editContent'){
+#修改文件
+else if($mode =='editFile'){
     $content = file_get_contents($filename);
     //  echo $content;
-    $str = " <form action='index.php?mode=doEdit' method ='post'>
+    $str = " <form action='index.php?mode=doEditFile' method ='post'>
             <input type='hidden' name ='filename' value ='{$filename}' />
             <input type='hidden' name='path' value='{$path}' />
             <textarea name='content' clos='190' rows='10' >{$content}</textarea>
@@ -54,7 +78,7 @@ else if($mode =='editContent'){
         </form>";
     echo $str;
 }
-else if($mode == 'doEdit'){
+else if($mode == 'doEditFile'){
     $content =$_REQUEST['content'];
     if(strlen($content)){
         if(file_put_contents($filename,$content)){
@@ -69,6 +93,7 @@ else if($mode == 'doEdit'){
         alertMsg($msg, $url);
     }
 }
+#重命名文件
 else if($mode =='renameFile'){
     $str = " <form action='index.php?mode=doRenameFile' method ='post'>
             <input type='hidden' name ='filename' value ='{$filename}' />
@@ -84,13 +109,98 @@ else if($mode =='doRenameFile'){
     $msg =renameFile($filename,$newFilename);
    alertMsg($msg,$url);
 }
+
+#复制文件
+else if($mode == 'copyFile'){
+    $str = "
+        <form action='index.php?mode=doCopyFile' method ='post'>
+            <input type='hidden' name='filename' value='{$filename}'/>
+            <input type='hidden' name='path' value='{$path}'/>
+               <label>文件复制</label>
+            <input type='name'   name='newName'  placeholder='{$filename}'>
+            <input type='submit' value='确定' />
+</form>";
+    echo $str;
+}else if($mode =='doCopyFile'){
+    $disname = $_REQUEST['newName'];
+    $msg = copyFile($filename, $path."/".$disname);
+    echo $msg;
+  //  alertMsg($msg,$url);
+}
+#剪切文件
+
+
+#删除文件
 else if($mode=='deleteFile'){
     $msg = deleteFile($filename);
     alertMsg($msg, $url);
 }
+#下载文件
 elseif($mode =='downFile'){
     downloadFile($filename);
 }
+/******文件操作结束****/
+
+
+
+#重命名
+else if($mode =='renameFolder'){
+    $str="
+        <form action='index.php?mode=doRenameFolder' method='post'>
+            <input type='text' name='path' value='{$path}' />
+            <input type='text' name='filename' value='{$filename}' />
+            <label>请输入新的文件夹名称：</label>
+            <input type='text' name='disFile' >
+            <input type='submit' value='确定'>
+        </form>
+    ";
+    echo $str;
+}
+else if($mode =='doRenameFolder'){
+    $src = $filename;
+    $dis =$_REQUEST['disFile'];
+    $msg = renameFolder($src,"file/".$dis);
+    alertMsg($msg, $url);
+}
+
+#复制文件夹
+elseif($mode == 'copyFolder'){
+    $str ="
+        <form action='index.php?mode=doCopyFolder' method='post'>
+            <input type='hidden' name='filename' value='{$filename}' />
+            <input type='hidden' name='path' value='{$path}' />
+            <label>复制到：</label>
+            <input type='text' name='disFile' placeholder='复制到'>
+            <input type='submit' value='确定'/>
+        </form>";
+    echo $str;
+}else if($mode == 'doCopyFolder'){
+    $srcFile= $filename;
+    $dis = $_REQUEST['disFile'];
+
+    $msg = copyFolder($srcFile, 'file'."/".$dis);
+    alertMsg($msg, $urlt);
+}
+
+#剪切文件夹
+elseif($mode =='cutFolder'){
+    $str ="
+        <form action='index.php?mode=doCutFolder' method='post'>
+            <input type='hidden' name='filename' value='{$filename}' />
+            <input type='hidden' name='path' value='{$path}' />
+            <label>前切：</label>
+            <input type='text' name='disFile' placeholder='前切到'>
+            <input type='submit' value='确定'/>
+        </form>";
+    echo $str;
+}else if($mode =='doCutFolder'){
+    $dirpath = $filename;
+    $distpath = $_REQUEST['disFile'];
+  //  echo $dirpath."==========". $path."/".$distpath;
+   $msg = cutFolder($dirpath, $path."/".$distpath);
+   alertMsg($msg,$url);
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -184,7 +294,9 @@ elseif($mode =='downFile'){
                 <tr>
                     <td><?php echo $i; ?></td>
                     <td><?php echo $file; ?></td>
-                    <td><?php $src = filetype($p)=="file"?"file_ico.png": "folder_ico.png"; ?> <img src="images/<?php echo $src; ?> " title="<?php $src =filetype($p)=="file"?"文件":"文件夹"; echo $src; ?>" </img></td>
+                    <td><?php $src = filetype($p)=="file"?"file": "folder"; ?>
+                        <span class="icon icon-mid "><span class="icon-<?php echo $src;?>" title="<?php $src =filetype($p)=="file"?"文件":"文件夹"; echo $src; ?>"></span></span>
+                      </td>
                     <td><?php $size =filesize($p); echo transByte($size) ; ?></td>
                     <td><?php $r =is_readable($p)?"correct.png":"error.png"; ?> <img src="images/<?php echo $r?>"  class="small" /></td>
                     <td><?php $w =is_writable($p)?"correct.png":"error.png"; ?> <img src="images/<?php echo $w?>"  class="small"/></td>
@@ -202,12 +314,14 @@ elseif($mode =='downFile'){
                         <?php
                             }else{
                         ?>
-                            <a href="index.php?mode=showContent&path=<?php echo $path;?>&filename=<?php echo $p;?>" ><img class="small" src="images/show.png"  alt="" title="查看"/></a>|
+                            <a href="index.php?mode=viewFile&path=<?php echo $path;?>&filename=<?php echo $p;?>" ><img class="small" src="images/show.png"  alt="" title="查看"/></a>|
                         <?php } ?>
-                        <a href="index.php?mode=editContent&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/edit.png"  alt="" title="修改"/></a>|
+                        <a href="index.php?mode=editFile&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/edit.png"  alt="" title="修改"/></a>|
                         <a href="index.php?mode=renameFile&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/rename.png"  alt="" title="重命名"/></a>|
                         <a href="index.php?mode=copyFile&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/copy.png"  alt="" title="复制"/></a>|
-                        <a href="index.php?mode=cutFile&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/cut.png"  alt="" title="剪切"/></a>|
+
+                      <!--  <a href="index.php?mode=cutFolder&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/cut.png"  alt="" title="剪切"/></a>|-->
+                      <!---->  <a href="index.php?mode=cutFile&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/cut.png"  alt="" title="剪切"/></a>|
                         <a href="#"  onclick="delFile('<?php echo $p;?>','<?php echo $path;?>')"><img class="small" src="images/delete.png"  alt="" title="删除"/></a>|
                         <a href="index.php?mode=downFile&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small"  src="images/download.png"  alt="" title="下载"/></a>
                     </td>
@@ -230,7 +344,10 @@ elseif($mode =='downFile'){
                 <tr>
                     <td><?php echo $i; ?></td>
                     <td><?php echo $file; ?></td>
-                    <td><?php $src = filetype($p)=="file"?"file_ico.png": "folder_ico.png"; ?> <img src="images/<?php echo $src; ?> " title="<?php $src =filetype($p)=="file"?"文件":"文件夹"; echo $src; ?>" </img></td>
+                    <td><?php $src = filetype($p)=="file"?"file": "folder"; ?>
+
+                        <span class="icon icon-mid "><span class="icon-<?php echo $src;?>" title="<?php $src =filetype($p)=="file"?"文件":"文件夹"; echo $src; ?>"></span></span>
+                        </td>
                     <td><?php $sum =0;$size =dirsize($p); echo transByte($size) ; ?></td>
                     <td><?php $r =is_readable($p)?"correct.png":"error.png"; ?> <img src="images/<?php echo $r?>"  class="small" /></td>
                     <td><?php $w =is_writable($p)?"correct.png":"error.png"; ?> <img src="images/<?php echo $w?>"  class="small"/></td>
@@ -240,11 +357,11 @@ elseif($mode =='downFile'){
                     <td><?php echo date("Y-m-d H:i:m",fileatime($p)); ?></td>
                     <td>
                         <a href="index.php?path=<?php echo $p;?>"><img class="small" src="images/show.png"  alt="" title="查看"/></a>
-                        <a href="index.php?mode=renameFile&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/rename.png"  alt="" title="重命名"/></a>|
-                        <a href="index.php?mode=copyFile&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/copy.png"  alt="" title="复制"/></a>|
-                        <a href="index.php?mode=cutFile&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/cut.png"  alt="" title="剪切"/></a>|
+                        <a href="index.php?mode=renameFolder&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/rename.png"  alt="" title="重命名"/></a>|
+                        <a href="index.php?mode=copyFolder&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/copy.png"  alt="" title="复制"/></a>|
+                        <a href="index.php?mode=cutFolder&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/cut.png"  alt="" title="剪切"/></a>|
                         <a href="#"  onclick="delFile('<?php echo $p;?>','<?php echo $path;?>')"><img class="small" src="images/delete.png"  alt="" title="删除"/></a>|
-                        <a href="index.php?mode=downFile&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small"  src="images/download.png"  alt="" title="下载"/></a>
+                        <a href="index.php?mode=downFolder&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small"  src="images/download.png"  alt="" title="下载"/></a>
                     </td>
 
                     </td>

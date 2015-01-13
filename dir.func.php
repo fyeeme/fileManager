@@ -68,4 +68,83 @@ function createFolder($dirname){
     return $msg;
 }
 
+/**
+ * 复制文件夹
+ * @param $srcFile
+ * @param $disFile
+ * @return string
+ */
+function copyFolder($srcFile, $disFile){
 
+    if(is_file($srcFile)){
+        copy($srcFile, $disFile."/".basename($srcFile));
+    }else{
+        $handler = opendir($srcFile);
+        if(!file_exists($disFile)){
+            mkdir($disFile,0777,true);
+        }
+        while(($item = readdir($handler)) !== false){
+            if($item != "." && $item != ".."){
+                if(is_file($srcFile."/".$item)){
+                    copy($srcFile."/".$item, $disFile."/".basename($item));
+                }
+                if(is_dir($srcFile."/".$item)){
+                    $func = __FUNCTION__;
+                    $func($srcFile."/".$item, $disFile."/".$item);
+                }
+            }
+        }
+        closedir($srcFile);
+    }
+    return "复制成功";
+}
+
+
+/**
+ * 重命名
+ * @param $src
+ * @param $dis
+ * @return string
+ */
+function renameFolder($src, $dis){
+    if(!isvalidate(basename($dis))){
+        if(!file_exists($dis)){
+            if(rename($src,$dis)){
+                $msg = "重命名成功";
+            }else{
+                $msg="重命名失败";
+            }
+        }else{
+            $msg = "存在同名的文件夹";
+        }
+    }else{
+        $msg="非法文件夹名称";
+    }
+    return $msg;
+}
+
+/**
+ * 剪切文件夹
+ * @param $srcPath
+ * @param $distPath
+ */
+function cutFolder($srcPath, $distPath){
+    if(file_exists($distPath)){
+        if( (is_dir($distPath))){
+            if(!file_exists($distPath."/".basename($srcPath))){
+                if(rename($srcPath, $distPath."/".basename($srcPath))){
+                    $msg ="复制成功";
+                }else{
+                    $msg="复制失败";
+                }
+            }else{
+                $msg ="已存在同名文件夹";
+            }
+        }else{
+            $msg = "只能复制到文件";
+        }
+    }else{
+        $msg = "目标文件夹不存在";
+    }
+    return $msg;
+}

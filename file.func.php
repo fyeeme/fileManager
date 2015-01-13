@@ -75,6 +75,24 @@ function deleteFile($fileName){
     return $msg;
 }
 
+function copyFile($oldFile, $newFIle){
+    if(file_exists($newFIle)){
+
+        if(!file_exists($newFIle."/".basename($oldFile))){
+            if(copy($oldFile,$newFIle."/".basename($oldFile))){
+                $msg = "文件复制成功";
+            }else{
+                $msg="文件复制失败";
+            }
+        }else{
+            $msg ="该目录下已经存在相同的文件";
+        }
+    }else{
+        $msg ='目标文件夹不存在';
+    }
+    return $msg;
+}
+
 function downloadFile($fileName){
     header("content-disposition:attachment;filename=".basename($fileName));
     header("content-length:".filesize($fileName));
@@ -127,6 +145,23 @@ function uploadFile($file, $path){
     return $msg;
 }
 
+function cuteFile($src, $dist){
+    if(!isvalidate($dist)){
+        if(!file_exists($dist."/".basename($src))){
+            if(rename($src, $dist."/".basename($src))){
+                $msg ="剪切成功";
+            }else{
+                $msg="剪切失败";
+            }
+        }else{
+            $msg = "已存在相同的文件";
+        }
+    }else{
+        $msg = "不能包含非法字符";
+    }
+    return $msg;
+
+}
 
 function isvalidate($param){
     $p = '/[\/,\*,<>,\?\|]/';
