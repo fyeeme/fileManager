@@ -106,7 +106,6 @@ function uploadFile($file, $path){
     //判断错误号
     if($file['error'] ==UPLOAD_ERR_OK){
         if(is_uploaded_file($file['tmp_name'])){
-            echo 1;
             $suffix = get_extension($file['name']);
             $unipid =getUniqidName();
             $destination = $path."/".pathinfo($file['name'],PATHINFO_FILENAME)."_".$unipid.".".$suffix;

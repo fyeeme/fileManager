@@ -148,3 +148,25 @@ function cutFolder($srcPath, $distPath){
     }
     return $msg;
 }
+
+
+function deleteFolder($filePath){
+    if(file_exists($filePath)){
+        $handler = opendir($filePath);
+        while(($item =readdir($handler))!== false){
+            if($item !="." && $item !=".."){
+                if(is_file($filePath."/".$item)){
+                    unlink($filePath."/".$item);
+                }else{
+                    deleteFolder($filePath."/".$item);
+                }
+            }
+        }
+        closedir($handler);
+        rmdir($filePath);
+        $msg ="文件夹删除成功";
+    }else{
+        $msg = "目标文件夹不存在";
+    }
+    return $msg;
+}

@@ -35,24 +35,8 @@ else if($mode =='上传文件'){
     alertMsg($msg, $url);
 }
 #主目录操作结束
-if($mode=='cutFile'){
-    $str ="
-        <form action='index.php?mode=doCutFile' method='post'>
-            <input type='hidden' name='filename' value='{$filename}' />
-            <input type='hidden' name='path' value='{$path}' />
-            <label>前切：</label>
-            <input type='text' name='disFile' placeholder='前切到'>
-            <input type='submit' value='确定'/>
-        </form>";
-    echo $str;
-}else if($mode =='doCutFile'){
-    $src = $filename;
-    $dist = $_REQUEST['disFile'];
 
-    $msg =cuteFile($src, $path."/".$dist);
-    alertMsg($msg, $url);
-}
-
+#################文件操作####################
 
 #查看文件
 else if($mode == 'viewFile'){
@@ -124,11 +108,27 @@ else if($mode == 'copyFile'){
 }else if($mode =='doCopyFile'){
     $disname = $_REQUEST['newName'];
     $msg = copyFile($filename, $path."/".$disname);
-    echo $msg;
-  //  alertMsg($msg,$url);
+   // echo $msg;
+  alertMsg($msg,$url);
 }
 #剪切文件
+if($mode=='cutFile'){
+    $str ="
+        <form action='index.php?mode=doCutFile' method='post'>
+            <input type='hidden' name='filename' value='{$filename}' />
+            <input type='hidden' name='path' value='{$path}' />
+            <label>前切：</label>
+            <input type='text' name='disFile' placeholder='前切到'>
+            <input type='submit' value='确定'/>
+        </form>";
+    echo $str;
+}else if($mode =='doCutFile'){
+    $src = $filename;
+    $dist = $_REQUEST['disFile'];
 
+    $msg =cuteFile($src, $path."/".$dist);
+    alertMsg($msg, $url);
+}
 
 #删除文件
 else if($mode=='deleteFile'){
@@ -142,7 +142,7 @@ elseif($mode =='downFile'){
 /******文件操作结束****/
 
 
-
+#################文件夹操作####################
 #重命名
 else if($mode =='renameFolder'){
     $str="
@@ -196,11 +196,14 @@ elseif($mode =='cutFolder'){
 }else if($mode =='doCutFolder'){
     $dirpath = $filename;
     $distpath = $_REQUEST['disFile'];
-  //  echo $dirpath."==========". $path."/".$distpath;
    $msg = cutFolder($dirpath, $path."/".$distpath);
    alertMsg($msg,$url);
 }
 
+else if($mode =='deleteFolder'){
+    $msg = deleteFolder($filename);
+    alertMsg($msg,$url);
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -360,7 +363,7 @@ elseif($mode =='cutFolder'){
                         <a href="index.php?mode=renameFolder&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/rename.png"  alt="" title="重命名"/></a>|
                         <a href="index.php?mode=copyFolder&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/copy.png"  alt="" title="复制"/></a>|
                         <a href="index.php?mode=cutFolder&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small" src="images/cut.png"  alt="" title="剪切"/></a>|
-                        <a href="#"  onclick="delFile('<?php echo $p;?>','<?php echo $path;?>')"><img class="small" src="images/delete.png"  alt="" title="删除"/></a>|
+                        <a href="#"  onclick="delFolder('<?php echo $p;?>','<?php echo $path;?>')"><img class="small" src="images/delete.png"  alt="" title="删除"/></a>|
                         <a href="index.php?mode=downFolder&path=<?php echo $path;?>&filename=<?php echo $p;?>"><img class="small"  src="images/download.png"  alt="" title="下载"/></a>
                     </td>
 
@@ -396,6 +399,11 @@ elseif($mode =='cutFolder'){
     function delFile(file, path){
         if(window.confirm("要删除该为文件吗？删除后无法恢复！")){
             window.location.href='index.php?mode=deleteFile&filename='+file+'&path='+path;
+        }
+    }
+    function delFolder(file, path){
+        if(window.confirm("要删除该为文件吗？删除后无法恢复！")){
+            window.location.href='index.php?mode=deleteFolder&filename='+file+'&path='+path;
         }
     }
     function getBack(backUrl){
